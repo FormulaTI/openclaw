@@ -1,12 +1,4 @@
 # Opt-in plugin dependencies at build time (space- or comma-separated directory names).
-# Example: docker build --build-arg OPENCLAW_EXTENSIONS="diagnostics-otel,matrix" .
-#
-# Multi-stage build produces a minimal runtime image without build tools,
-# source code, or Bun. Works with Docker, Buildx, and Podman.
-# The dependency manifest stages extract only package.json files, so the main
-# build layer is not invalidated by unrelated source changes.
-#
-# Build stages use full bookworm; the runtime image is always bookworm-slim.
 ARG OPENCLAW_EXTENSIONS=""
 ARG OPENCLAW_BUNDLED_PLUGIN_DIR=extensions
 ARG OPENCLAW_NODE_BOOKWORM_IMAGE="node:24-bookworm@sha256:3a09aa6354567619221ef6c45a5051b671f953f0a1924d1f819ffb236e520e6b"
@@ -55,7 +47,7 @@ COPY scripts/lib/package-dist-imports.mjs ./scripts/lib/package-dist-imports.mjs
 COPY --from=workspace-deps /out/packages/ ./packages/
 COPY --from=workspace-deps /out/${OPENCLAW_BUNDLED_PLUGIN_DIR}/ ./${OPENCLAW_BUNDLED_PLUGIN_DIR}/
 
-RUN --mount=type=cache,target=/root/.local/share/pnpm/store,sharing=locked \
+RUN --mount=type=cache,id=s/23bcade7-ed70-430a-9e67-94cc9791c3a5-pnpm-store,target=/root/.local/share/pnpm/store,sharing=locked \
     NODE_OPTIONS=--max-old-space-size=2048 pnpm install --frozen-lockfile \
       --config.supportedArchitectures.os=linux \
       --config.supportedArchitectures.cpu="$(node -p 'process.arch')" \
@@ -97,7 +89,7 @@ RUN pnpm_config_verify_deps_before_run=false pnpm qa:lab:build
 FROM build AS runtime-assets
 ARG OPENCLAW_EXTENSIONS
 ARG OPENCLAW_BUNDLED_PLUGIN_DIR
-RUN --mount=type=cache,target=/root/.local/share/pnpm/store,sharing=locked \
+RUN --mount=type=cache,id=s/23bcade7-ed70-430a-9e67-94cc9791c3a5-pnpm-store,target=/root/.local/share/pnpm/store,sharing=locked \
     pnpm list --prod --depth Infinity --json | node scripts/list-prod-store-packages.mjs | xargs -r pnpm store add && \
     CI=true pnpm prune --prod \
       --config.offline=true \
@@ -128,8 +120,8 @@ LABEL org.opencontainers.image.source="https://github.com/openclaw/openclaw" \
 
 WORKDIR /app
 
-RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
-    --mount=type=cache,target=/var/lib/apt,sharing=locked \
+RUN --mount=type=cache,id=s/23bcade7-ed70-430a-9e67-94cc9791c3a5-apt-cache,target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,id=s/23bcade7-ed70-430a-9e67-94cc9791c3a5-apt-lists,target=/var/lib/apt,sharing=locked \
     apt-get update && \
     DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
       ca-certificates curl git hostname lsof openssl procps python3 tini && \
@@ -165,8 +157,8 @@ RUN install -d -m 0755 "$COREPACK_HOME" && \
 
 ARG OPENCLAW_IMAGE_APT_PACKAGES
 ARG OPENCLAW_DOCKER_APT_PACKAGES=""
-RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
-    --mount=type=cache,target=/var/lib/apt,sharing=locked \
+RUN --mount=type=cache,id=s/23bcade7-ed70-430a-9e67-94cc9791c3a5-apt-cache,target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,id=s/23bcade7-ed70-430a-9e67-94cc9791c3a5-apt-lists,target=/var/lib/apt,sharing=locked \
     packages="${OPENCLAW_IMAGE_APT_PACKAGES-$OPENCLAW_DOCKER_APT_PACKAGES}"; \
     if [ -n "$packages" ]; then \
       apt-get update && \
@@ -174,8 +166,8 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     fi
 
 ARG OPENCLAW_IMAGE_PIP_PACKAGES=""
-RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
-    --mount=type=cache,target=/var/lib/apt,sharing=locked \
+RUN --mount=type=cache,id=s/23bcade7-ed70-430a-9e67-94cc9791c3a5-apt-cache,target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,id=s/23bcade7-ed70-430a-9e67-94cc9791c3a5-apt-lists,target=/var/lib/apt,sharing=locked \
     if [ -n "$OPENCLAW_IMAGE_PIP_PACKAGES" ]; then \
       if ! python3 -m pip --version >/dev/null 2>&1; then \
         apt-get update && \
@@ -186,8 +178,8 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
 
 ARG OPENCLAW_INSTALL_BROWSER=""
 ENV PLAYWRIGHT_BROWSERS_PATH=/home/node/.cache/ms-playwright
-RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
-    --mount=type=cache,target=/var/lib/apt,sharing=locked \
+RUN --mount=type=cache,id=s/23bcade7-ed70-430a-9e67-94cc9791c3a5-apt-cache,target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,id=s/23bcade7-ed70-430a-9e67-94cc9791c3a5-apt-lists,target=/var/lib/apt,sharing=locked \
     if [ -n "$OPENCLAW_INSTALL_BROWSER" ]; then \
       apt-get update && \
       DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends xvfb && \
@@ -198,8 +190,8 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
 
 ARG OPENCLAW_INSTALL_DOCKER_CLI=""
 ARG OPENCLAW_DOCKER_GPG_FINGERPRINT="9DC858229FC7DD38854AE2D88D81803C0EBFCD88"
-RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
-    --mount=type=cache,target=/var/lib/apt,sharing=locked \
+RUN --mount=type=cache,id=s/23bcade7-ed70-430a-9e67-94cc9791c3a5-apt-cache,target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,id=s/23bcade7-ed70-430a-9e67-94cc9791c3a5-apt-lists,target=/var/lib/apt,sharing=locked \
     if [ -n "$OPENCLAW_INSTALL_DOCKER_CLI" ]; then \
       apt-get update && \
       DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
