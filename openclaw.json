@@ -1,7 +1,6 @@
 {
   "gateway": {
-    "mode": "local",
-    "logLevel": "debug"
+    "mode": "local"
   },
   "channels": {
     "slack": {
@@ -10,8 +9,7 @@
       "appToken": "${SLACK_APP_TOKEN}",
       "botToken": "${SLACK_BOT_TOKEN}",
       "dmPolicy": "open",
-      "groupPolicy": "open",
-      "logLevel": "debug"
+      "groupPolicy": "open"
     }
   },
   "agents": {
@@ -22,4 +20,5 @@
     }
   }
 }
+
 
