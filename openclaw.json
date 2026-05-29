@@ -11,7 +11,6 @@
       "botToken": "${SLACK_BOT_TOKEN}",
       "dmPolicy": "open",
       "groupPolicy": "open",
-      "agent": "leo",
       "logLevel": "debug"
     }
   },
@@ -19,8 +18,8 @@
     "defaults": {
       "model": {
         "primary": "anthropic/claude-sonnet-4-6"
-      },
-      "workspace": "/app/.agents/agents/leo"
+      }
     }
   }
 }
+
