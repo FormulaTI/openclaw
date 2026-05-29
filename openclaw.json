@@ -16,6 +16,7 @@
         "provider": "default",
         "id": "SLACK_BOT_TOKEN"
       },
+      "botName": "Formula Agent",
       "dmPolicy": "open",
       "groupPolicy": "open"
     }
@@ -28,3 +29,4 @@
     }
   }
 }
+
