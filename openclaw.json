@@ -17,7 +17,6 @@
       "model": {
         "primary": "anthropic/claude-sonnet-4-6"
       }
-    },
-    "dir": ".agents/agents"
+    }
   }
 }
