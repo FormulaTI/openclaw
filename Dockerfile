@@ -1,5 +1,5 @@
 # Opt-in plugin dependencies at build time (space- or comma-separated directory names).
-ARG OPENCLAW_EXTENSIONS=""
+ARG OPENCLAW_EXTENSIONS="slack"
 ARG OPENCLAW_BUNDLED_PLUGIN_DIR=extensions
 ARG OPENCLAW_NODE_BOOKWORM_IMAGE="node:24-bookworm@sha256:3a09aa6354567619221ef6c45a5051b671f953f0a1924d1f819ffb236e520e6b"
 ARG OPENCLAW_NODE_BOOKWORM_SLIM_IMAGE="node:24-bookworm-slim@sha256:e8e2e91b1378f83c5b2dd15f0247f34110e2fe895f6ca7719dbb780f929368eb"
