@@ -9,7 +9,12 @@
       "appToken": "${SLACK_APP_TOKEN}",
       "botToken": "${SLACK_BOT_TOKEN}",
       "dmPolicy": "open",
-      "defaultChannelPolicy": "mention"
+      "groupPolicy": "allowlist",
+      "channels": {
+        "C0B695JB6AK": {},
+        "C0B6QK9F0H0": {},
+        "C0B6SEC9VND": {}
+      }
     }
   },
   "agents": {
