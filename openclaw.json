@@ -9,7 +9,8 @@
       "appToken": "${SLACK_APP_TOKEN}",
       "botToken": "${SLACK_BOT_TOKEN}",
       "dmPolicy": "open",
-      "groupPolicy": "open"
+      "groupPolicy": "open",
+      "agent": "leo"
     }
   },
   "agents": {
